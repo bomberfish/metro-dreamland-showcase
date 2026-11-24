@@ -1,0 +1,321 @@
+/* The type. Segoe UI (Windows' own, where there is one) or bomberfish.ca's
+   copy of Segoe UI Variable, and that site's icon font, "Metro Symbols"
+   (Segoe UI Symbol's app bar glyphs, by name: see metro-dreamland's
+   README). Loaded from there rather than kept here: they're Microsoft's. */
+@font-face {
+	font-family: "Segoe UI Variable";
+	font-weight: 300 700;
+	font-style: normal;
+	font-display: swap;
+	src:
+		local("Segoe UI Variable Text"),
+		url("https://bomberfish.ca/fonts/sans/SegoeUI-VF-core.woff2")
+			format("woff2-variations");
+	unicode-range:
+		U+0000-017F, U+2000-206F, U+2070-209F, U+20A0-20BF, U+2100-214F,
+		U+2190-21FF, U+2200-22FF, U+25A0-25FF;
+}
+
+@font-face {
+	font-family: "Metro Symbols";
+	font-style: normal;
+	font-weight: 100 700;
+	font-display: block;
+	src: url("https://bomberfish.ca/fonts/icons/MetroSymbols.woff2")
+		format("woff2");
+	unicode-range: U+0020-007E, U+E000-F8FF;
+}
+
+.material-symbols {
+	font-family: "Metro Symbols";
+	font-weight: 400;
+	font-style: normal;
+	line-height: 1;
+	letter-spacing: normal;
+	text-transform: none;
+	display: inline-block;
+	white-space: nowrap;
+	direction: ltr;
+	font-feature-settings: "liga";
+	-webkit-font-smoothing: antialiased;
+}
+
+:root {
+	--font-body: "Segoe UI Variable", "Segoe UI", Selawik, system-ui, sans-serif;
+	--font-display: var(--font-body);
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	min-height: 100vh;
+	background: var(--m-bg);
+	color: var(--m-fg);
+	font-family: var(--font-body);
+	font-size: 1rem;
+	-webkit-font-smoothing: antialiased;
+	/* (the theme changes under it as a whole) */
+	transition:
+		background-color 0.2s ease,
+		color 0.2s ease;
+}
+
+a {
+	color: var(--accent);
+}
+
+/* ---- the page ----
+   Metro's grid: on a phone, 24 pixels in (12 of page margin, 12 of the
+   control's own); on anything wider, Windows 8's 120. The page's title
+   sits up under the application's name, and the app bar has its room at
+   the foot. */
+.frame {
+	/* (the pivot's headers run off the right edge: cut there, not made
+	   room for) */
+	overflow-x: clip;
+	padding: max(1.4rem, env(safe-area-inset-top)) max(1.2rem, env(safe-area-inset-right))
+		calc(var(--m-appbar-h, 63px) + 3rem) max(1.2rem, env(safe-area-inset-left));
+}
+
+@media (min-width: 48rem) {
+	.frame {
+		padding-left: 7.5rem;
+		padding-right: 3rem;
+		padding-top: 2.5rem;
+	}
+}
+
+/* the application's title over a page: PhoneTextNormalStyle, semibold, in
+   capitals */
+.app-title {
+	margin: 0 0 0.2rem;
+	font-size: 1rem;
+	font-weight: 600;
+	letter-spacing: 0.01em;
+}
+
+/* the page's title: light, lowercase, large (the pivot's headers are the
+   library's; a plain page's h1 is the same size) */
+.page-header h1 {
+	font-family: var(--font-display);
+	font-weight: 300;
+	letter-spacing: -0.02em;
+}
+
+/* (html clips what runs off the right: the pivot's headers do) */
+html {
+	overflow-x: clip;
+}
+
+/* ---- behind the page, for acrylic to frost ----
+   Nothing with flat tiles; with acrylic, soft fields of the accent and two
+   of its neighbours, so there's something to see through the glass. */
+.backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: -1;
+	display: none;
+	background:
+		radial-gradient(60vmax 50vmax at 10% 15%, hsla(var(--accent-hsl), 0.6), transparent 70%),
+		var(--m-bg);
+}
+
+/* (and two of its neighbours, where relative colours are understood: a
+   declaration with var() in it can't fall back to the one before) */
+@supports (color: hsl(from red calc(h + 60) s l / 0.5)) {
+	.backdrop {
+		background:
+			radial-gradient(60vmax 50vmax at 10% 15%, hsla(var(--accent-hsl), 0.6), transparent 70%),
+			radial-gradient(50vmax 45vmax at 90% 30%, hsl(from var(--accent) calc(h + 60) s l / 0.5), transparent 70%),
+			radial-gradient(55vmax 50vmax at 45% 95%, hsl(from var(--accent) calc(h - 70) s l / 0.45), transparent 70%),
+			var(--m-bg);
+	}
+}
+
+[data-m-material="acrylic"] .backdrop {
+	display: block;
+}
+
+[data-m-material="acrylic"] body {
+	background: transparent;
+}
+
+/* A background picture (settings): one of Windows 8's wallpapers, behind
+   every page whatever the tiles are made of, as Windows 8.1's start screen
+   could have the desktop's. Under a wash of the theme's colour, so what's
+   written on the page still reads; less of one with acrylic, whose glass
+   is there to show what's behind it. */
+html[data-wallpaper] .backdrop {
+	display: block;
+	background:
+		linear-gradient(rgba(var(--m-bg-rgb), 0.55), rgba(var(--m-bg-rgb), 0.55)),
+		var(--wallpaper) center / cover no-repeat,
+		var(--m-bg);
+}
+
+html[data-wallpaper][data-m-material="acrylic"] .backdrop {
+	background:
+		linear-gradient(rgba(var(--m-bg-rgb), 0.3), rgba(var(--m-bg-rgb), 0.3)),
+		var(--wallpaper) center / cover no-repeat,
+		var(--m-bg);
+}
+
+html[data-wallpaper] body {
+	background: transparent;
+}
+
+/* ---- bits of the demos ---- */
+.tile-glyph {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	font-size: 2.2rem;
+	pointer-events: none;
+}
+
+.materials {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.5rem;
+}
+
+/* (two tiles across) */
+.material-sample {
+	--u: 4.4rem;
+	--g: 0.6rem;
+	width: calc(2 * var(--u) + var(--g));
+}
+
+.material-name {
+	margin: 0 0 0.4rem;
+	color: var(--m-subtle);
+}
+
+.toggle-label {
+	margin: 0;
+	font-size: 1.1333rem;
+}
+
+.swivel-line {
+	margin: 0 0 0.6rem;
+	font-size: 1.6rem;
+	font-weight: 350;
+}
+
+.tilt-pad {
+	display: grid;
+	place-items: center;
+	width: 9rem;
+	height: 9rem;
+	background: var(--accent);
+	color: #fff;
+	font-size: 1.1333rem;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+/* ---- the settings, on a tablet or desktop: a Windows 8 page that pans
+   sideways (./pages/Settings.tsx). The page is the window's height; its
+   groups stand side by side under their names (Windows 8's subheader,
+   26.667 light), 80 pixels apart, and the pictures fill the height and
+   flow on to the right, big enough to tell apart. ---- */
+:where(:root:not([data-m-form-factor="phone"])) {
+	& .settings-frame {
+		display: flex;
+		flex-direction: column;
+		box-sizing: border-box;
+		height: 100vh;
+		height: 100dvh;
+		padding-bottom: 0;
+		padding-right: 0;
+	}
+
+	& .settings-frame .body {
+		flex: 1;
+		min-height: 0;
+		max-width: none;
+		display: flex;
+		gap: 80px;
+		margin-top: 1.5rem;
+		padding: 0 3rem calc(var(--m-appbar-h, 68px) + 24px) 0;
+		overflow-x: auto;
+		overflow-y: hidden;
+		scrollbar-width: thin;
+	}
+
+	& .settings-frame .group {
+		flex: none;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		width: 320px;
+		min-height: 0;
+	}
+
+	& .settings-frame .group-title {
+		margin-bottom: 4px !important;
+	}
+
+	/* (Windows 8's controls have no room round them of their own: a page
+	   spaces them) */
+	& .sections .m-listpicker,
+	& .sections .m-textbox,
+	& .sections .m-datetime {
+		margin-top: 12px;
+	}
+
+	& .settings-frame .group-title {
+		display: block;
+		margin: 0 0 20px;
+		font-size: 26.667px;
+		font-weight: 300;
+		line-height: 1.2;
+	}
+
+	& .settings-frame .accent-header {
+		display: none;
+	}
+
+	& .settings-frame .accents {
+		grid-template-columns: repeat(5, 1fr);
+		gap: 10px;
+	}
+
+	& .settings-frame .pictures-group {
+		width: auto;
+	}
+
+	& .settings-frame .pictures {
+		flex: 1;
+		min-height: 0;
+		grid-template-columns: none;
+		grid-template-rows: repeat(auto-fill, 150px);
+		grid-auto-flow: column;
+		grid-auto-columns: 240px;
+		gap: 10px;
+		margin: 0;
+	}
+
+	& .settings-frame .pictures button {
+		aspect-ratio: auto;
+		height: 150px;
+	}
+}
+
+/* what's said of only one form factor's controls (metro-dreamland's
+   formfactor.ts): the phone's, or Windows 8's */
+:where(:root:not([data-m-form-factor="phone"])) .only-phone,
+:where([data-m-form-factor="phone"]) .only-desktop {
+	display: none;
+}

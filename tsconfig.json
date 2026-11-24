@@ -1,0 +1,37 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"useDefineForClassFields": true,
+		"module": "ESNext",
+		"lib": ["ES2022", "DOM", "DOM.Iterable"],
+		"types": ["vite/client"],
+		"skipLibCheck": true,
+
+		/* Bundler mode */
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": false,
+		"moduleDetection": "force",
+		"noEmit": true,
+
+		/* metro-dreamland is linked from beside this repo and has no
+		   node_modules of its own: its imports of dreamland resolve to this
+		   repo's (as resolve.dedupe does for Vite, in vite.config.ts) */
+		"paths": {
+			"dreamland/*": ["./vendor/dreamland/dist/*"]
+		},
+
+		/* Linting */
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"erasableSyntaxOnly": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedSideEffectImports": true,
+
+		/* dreamland */
+		"jsx": "react-jsx",
+		"jsxImportSource": "dreamland"
+	},
+	"include": ["src"]
+}
