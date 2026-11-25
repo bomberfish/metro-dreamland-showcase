@@ -64,6 +64,14 @@ startMetro({
 	host: "#app",
 	pivots: ["/", "/pickers", "/menus", "/tiles", "/motion"],
 	material: "flat",
+	// how the sections are got to (the settings page can change it): the
+	// pivot, except on a tablet held sideways, which has room for Windows
+	// 8's PC settings sidebar
+	navigation: {
+		phone: "pivot",
+		tablet: { portrait: "pivot", landscape: "sidebar" },
+		desktop: "pivot",
+	},
 });
 document.querySelector("#app")!.replaceWith(<App />);
 metroReady();

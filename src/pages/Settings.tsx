@@ -1,13 +1,21 @@
 import { css, type Component } from "dreamland/core";
 import {
 	formFactorChoice,
+	type Idiom,
+	idiom,
 	ListPicker,
 	material,
+	navigation,
+	type NavigationRule,
+	navigationRules,
+	orientation,
 	Page,
 	PageHeader,
+	resolveNavigation,
 	RingButton,
 	setFormFactor,
 	setMaterial,
+	setNavigation,
 	type FormFactorChoice,
 } from "metro-dreamland";
 import {
@@ -30,6 +38,41 @@ const NAMES = WALLPAPERS.map((w, i) => {
 	return set.length > 1 ? `${w.set}, ${n} of ${set.length}` : w.set;
 });
 
+// How each kind of device gets to the sections: the pivot, the sidebar, or
+// the sidebar only while it's held sideways (or only upright). What's set
+// for each now, as one of those, from the rules in force (the showcase's
+// own, ./main.tsx, until one's changed here).
+type Way = "pivot" | "sidebar" | "landscape" | "portrait";
+const IDIOMS: { idiom: Idiom; label: string }[] = [
+	{ idiom: "phone", label: "on a phone" },
+	{ idiom: "tablet", label: "on a tablet" },
+	{ idiom: "desktop", label: "on a desktop" },
+];
+const WAYS = [
+	{ value: "pivot", label: "pivot" },
+	{ value: "sidebar", label: "sidebar" },
+	{ value: "landscape", label: "sidebar when held sideways" },
+	{ value: "portrait", label: "sidebar when held upright" },
+];
+const wayFor = (on: Idiom): Way => {
+	const rules = navigationRules();
+	const upright = resolveNavigation(rules, on, "portrait");
+	const sideways = resolveNavigation(rules, on, "landscape");
+	if (upright === sideways) return upright;
+	return sideways === "sidebar" ? "landscape" : "portrait";
+};
+const ruleFor = (way: Way): NavigationRule =>
+	way === "landscape"
+		? { portrait: "pivot", landscape: "sidebar" }
+		: way === "portrait"
+			? { portrait: "sidebar", landscape: "pivot" }
+			: way;
+// (what it comes to here, now: "the pivot, on this desktop, held sideways")
+const now = () =>
+	`Here and now: the ${navigation()}, on this ${idiom()}, ${
+		orientation() === "portrait" ? "upright" : "sideways"
+	}.`;
+
 // (a radio group's buttons: the one pressed is the one that's checked)
 const check = (e: Event) => {
 	for (const b of (e.currentTarget as HTMLElement).parentElement!.children)
@@ -43,6 +86,19 @@ const check = (e: Event) => {
 // tall as the window, flowing to the right (and a mouse wheel moves it
 // along, as Windows 8's horizontal pages did).
 export let Settings: Component = function () {
+	// (each kind of device's, as the page opens; the pickers change them)
+	const chosenWays = Object.fromEntries(
+		IDIOMS.map(({ idiom: on }) => [on, wayFor(on)])
+	) as Record<Idiom, Way>;
+	const nowLine = (<p class="hint" aria-live="polite">{now()}</p>) as HTMLElement;
+	// (and it follows the window: turned, or made narrow enough for a phone)
+	const follow = () => {
+		if (nowLine.isConnected) return void (nowLine.textContent = now());
+		removeEventListener("m-navigation", follow);
+		removeEventListener("resize", follow);
+	};
+	addEventListener("m-navigation", follow);
+	addEventListener("resize", follow);
 	return (
 		<Page>
 			<div class="frame settings-frame">
@@ -107,6 +163,32 @@ export let Settings: Component = function () {
 							A phone gets Windows Phone's controls; a tablet or desktop,
 							Windows 8's. Choose one to see it anywhere.
 						</p>
+					</section>
+					<section class="group">
+						<h2 class="group-title">navigation</h2>
+						<p class="m-header accent-header">navigation</p>
+						<p class="hint">
+							How the sections are got to: the pivot, or Windows 8's PC
+							settings sidebar. For each kind of device, and which way up
+							it's held.
+						</p>
+						{IDIOMS.map(({ idiom: on, label }) => (
+							<ListPicker
+								header={label}
+								items={WAYS}
+								value={wayFor(on)}
+								onchange={(v) => {
+									chosenWays[on] = v as Way;
+									setNavigation({
+										phone: ruleFor(chosenWays.phone),
+										tablet: ruleFor(chosenWays.tablet),
+										desktop: ruleFor(chosenWays.desktop),
+									});
+									nowLine.textContent = now();
+								}}
+							/>
+						))}
+						{nowLine}
 					</section>
 					<section class="group">
 						<h2 class="group-title">accent colour</h2>

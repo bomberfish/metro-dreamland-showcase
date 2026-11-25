@@ -79,7 +79,8 @@ a {
    control's own); on anything wider, Windows 8's 120. The page's title
    sits up under the application's name, and the app bar has its room at
    the foot. */
-.frame {
+.frame,
+.showcase-sections > .m-sections-pivot {
 	/* (the pivot's headers run off the right edge: cut there, not made
 	   room for) */
 	overflow-x: clip;
@@ -88,7 +89,8 @@ a {
 }
 
 @media (min-width: 48rem) {
-	.frame {
+	.frame,
+	.showcase-sections > .m-sections-pivot {
 		padding-left: 7.5rem;
 		padding-right: 3rem;
 		padding-top: 2.5rem;
@@ -318,4 +320,10 @@ html[data-wallpaper] body {
 :where(:root:not([data-m-form-factor="phone"])) .only-phone,
 :where([data-m-form-factor="phone"]) .only-desktop {
 	display: none;
+}
+
+/* a section with the sidebar: what's in it beside the pane, from about
+   where the pane's title is, clear of the app bar at the foot */
+.showcase-sections .m-navpane-content {
+	padding: 58px 3rem calc(var(--m-appbar-h, 63px) + 3rem) clamp(1.5rem, 5vw, 80px);
 }
